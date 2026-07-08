@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clicker Unit</title>
+<style>
+  :root {
+    --bg-page: #101113;
+    --panel: #3f4247;
+    --panel-2: #2f3236;
+    --panel-deep: #24262a;
+    --red-light: #ef5c4f;
+    --red: #d1352c;
+    --red-dark: #7a1a15;
+    --brass-light: #e0c06f;
+    --brass: #c9a24b;
+    --green: #3ecf6a;
+    --counter-bg: #101110;
+    --digit: #f0ead6;
+    --text-label: #c9cace;
+    --text-muted: #9a9ca2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(ellipse at 50% 28%, #202226 0%, var(--bg-page) 72%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text-label);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 360px;
+    border-radius: 22px;
+    background:
+      repeating-linear-gradient(100deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px),
+      linear-gradient(160deg, var(--panel), var(--panel-2));
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .stripe {
+    height: 9px;
+    border-radius: 22px 22px 0 0;
+    background: repeating-linear-gradient(135deg, var(--panel-deep), var(--panel-deep) 9px, var(--brass) 9px, var(--brass) 18px);
+  }
+
+  .card-body {
+    padding: 26px 30px 30px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin: 0 0 10px;
+  }
+
+  .instruction {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-label);
+    margin: 0 0 22px;
+    line-height: 1.4;
+  }
+
+  .counter-caption {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .counter {
+    display: inline-flex;
+    gap: 2px;
+    padding: 10px;
+    border-radius: 6px;
+    background: var(--counter-bg);
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.7), inset 0 -1px 0 rgba(255,255,255,0.05);
+  }
+
+  .counter.pop { animation: pop 0.18s ease-out; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .digit {
+    width: 28px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--digit);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3));
+    border-radius: 2px;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+  }
+
+  .power-label {
+    margin: 10px 0 26px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--brass-light);
+  }
+
+  .button-housing {
+    position: relative;
+    width: 210px;
+    height: 210px;
+    margin: 0 auto 26px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #45484d, var(--panel-deep));
+    box-shadow: 0 14px 26px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.08), inset 0 -5px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bolt {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #75787d, #1a1b1d 85%);
+    box-shadow: 0 1px 1px rgba(255,255,255,0.15);
+  }
+  .bolt-tl { top: 16px; left: 16px; }
+  .bolt-tr { top: 16px; right: 16px; }
+  .bolt-bl { bottom: 16px; left: 16px; }
+  .bolt-br { bottom: 16px; right: 16px; }
+
+  .click-button {
+    position: relative;
+    width: 158px;
+    height: 158px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: radial-gradient(circle at 35% 26%, var(--red-light), var(--red) 55%, var(--red-dark) 100%);
+    box-shadow:
+      0 9px 0 var(--red-dark),
+      0 15px 22px rgba(0,0,0,0.5),
+      inset 0 -6px 12px rgba(0,0,0,0.3),
+      inset 0 4px 6px rgba(255,255,255,0.16);
+    color: #fff4f0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-shadow: 0 2px 3px rgba(0,0,0,0.45);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .click-button:hover { filter: brightness(1.06); }
+
+  .click-button:active {
+    transform: translateY(8px);
+    box-shadow:
+      0 1px 0 var(--red-dark),
+      0 6px 10px rgba(0,0,0,0.4),
+      inset 0 -4px 10px rgba(0,0,0,0.35);
+  }
+
+  .click-button:focus-visible,
+  .upgrade-panel:focus-visible {
+    outline: 3px solid var(--brass);
+    outline-offset: 4px;
+  }
+
+  .float-text {
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--brass-light);
+    pointer-events: none;
+    animation: float-up 0.8s ease-out forwards;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  }
+
+  @keyframes float-up {
+    0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -68px) scale(1.08); }
+  }
+
+  .upgrade-panel {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, #383b40, #2c2e32);
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text-label);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 10px rgba(0,0,0,0.3);
+    transition: opacity 0.2s ease, filter 0.15s ease;
+  }
+
+  .upgrade-panel:not(:disabled):hover { filter: brightness(1.08); }
+  .upgrade-panel:not(:disabled):active { transform: scale(0.99); }
+
+  .upgrade-panel:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .upgrade-panel.purchased {
+    opacity: 1;
+    cursor: default;
+    border-color: rgba(62, 207, 106, 0.4);
+    animation: purchase-glow 0.5s ease-out;
+  }
+
+  @keyframes purchase-glow {
+    0% { box-shadow: 0 0 0 rgba(62,207,106,0); }
+    40% { box-shadow: 0 0 22px rgba(62,207,106,0.45); }
+    100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 10px rgba(0,0,0,0.3); }
+  }
+
+  .switch-track {
+    flex: none;
+    width: 38px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--panel-deep);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    position: relative;
+  }
+
+  .switch-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #8d8f94, #4c4e52);
+    transition: transform 0.25s ease, background 0.25s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  .upgrade-panel.purchased .switch-knob {
+    transform: translateX(18px);
+    background: radial-gradient(circle at 35% 30%, #8ff5b3, var(--green));
+  }
+
+  .upgrade-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-align: left;
+  }
+
+  .upgrade-name {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .upgrade-desc {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .upgrade-cost {
+    flex: none;
+    font-family: "Courier New", ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 4px 9px;
+    background: var(--counter-bg);
+    color: var(--brass);
+    border-radius: 4px;
+  }
+
+  @media (max-width: 380px) {
+    .button-housing { width: 180px; height: 180px; }
+    .click-button { width: 134px; height: 134px; font-size: 1rem; }
+    .digit { width: 22px; height: 36px; font-size: 1.35rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float-text,
+    .counter.pop,
+    .upgrade-panel.purchased,
+    .click-button {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="stripe" aria-hidden="true"></div>
+    <div class="card-body">
+      <p class="eyebrow">Clicker Unit &middot; Model 01</p>
+      <p class="instruction">Holding the button does nothing &mdash; only real presses count.</p>
+
+      <div class="counter-caption">Total Presses</div>
+      <div class="counter" id="counter"></div>
+      <div class="power-label" id="powerLabel">+1 PER PRESS</div>
+
+      <div class="button-housing">
+        <span class="bolt bolt-tl"></span>
+        <span class="bolt bolt-tr"></span>
+        <span class="bolt bolt-bl"></span>
+        <span class="bolt bolt-br"></span>
+        <button class="click-button" id="clickButton" aria-label="Press the button to add to your total">PRESS</button>
+      </div>
+
+      <button class="upgrade-panel" id="upgradeButton" disabled aria-label="Buy double output upgrade for 100 presses">
+        <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+        <span class="upgrade-text">
+          <span class="upgrade-name">Double Output</span>
+          <span class="upgrade-desc" id="upgradeDesc">Each press counts for 2</span>
+        </span>
+        <span class="upgrade-cost" id="upgradeCost">100</span>
+      </button>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var UPGRADE_COST = 100;
+  var MIN_DIGITS = 6;
+
+  var counter = 0;
+  var clickValue = 1;
+  var upgradeBought = false;
+
+  var counterEl = document.getElementById('counter');
+  var powerLabel = document.getElementById('powerLabel');
+  var clickButton = document.getElementById('clickButton');
+  var upgradeButton = document.getElementById('upgradeButton');
+  var upgradeDesc = document.getElementById('upgradeDesc');
+  var upgradeCost = document.getElementById('upgradeCost');
+
+  function renderDigits() {
+    var str = String(counter);
+    while (str.length < MIN_DIGITS) { str = '0' + str; }
+    counterEl.setAttribute('aria-label', counter.toLocaleString() + ' total presses');
+    counterEl.innerHTML = '';
+    for (var i = 0; i < str.length; i++) {
+      var d = document.createElement('span');
+      d.className = 'digit';
+      d.setAttribute('aria-hidden', 'true');
+      d.textContent = str[i];
+      counterEl.appendChild(d);
+    }
+  }
+
+  function render() {
+    renderDigits();
+    powerLabel.textContent = '+' + clickValue + ' PER PRESS';
+    if (!upgradeBought) {
+      upgradeButton.disabled = counter < UPGRADE_COST;
+    }
+  }
+
+  function pulseCounter() {
+    counterEl.classList.remove('pop');
+    void counterEl.offsetWidth; // restart the animation
+    counterEl.classList.add('pop');
+  }
+
+  function spawnFloatText(amount) {
+    var el = document.createElement('span');
+    el.className = 'float-text';
+    el.textContent = '+' + amount;
+    clickButton.appendChild(el);
+    setTimeout(function () { el.remove(); }, 800);
+  }
+
+  // A genuine "click" event fires exactly once per press-and-release,
+  // so simply holding the mouse or a finger down never adds extra presses.
+  clickButton.addEventListener('click', function () {
+    counter += clickValue;
+    render();
+    pulseCounter();
+    spawnFloatText(clickValue);
+  });
+
+  // The one gap a plain click listener leaves open: holding Enter/Space
+  // while the button is focused can auto-repeat through keyboard key-repeat.
+  // This blocks those repeats without affecting genuine separate presses.
+  clickButton.addEventListener('keydown', function (e) {
+    if (e.repeat) {
+      e.preventDefault();
+    }
+  });
+
+  upgradeButton.addEventListener('click', function () {
+    if (upgradeBought || counter < UPGRADE_COST) return;
+
+    counter -= UPGRADE_COST;
+    upgradeBought = true;
+    clickValue = 2;
+
+    upgradeButton.disabled = true;
+    upgradeButton.classList.add('purchased');
+    upgradeButton.setAttribute('aria-label', 'Double output upgrade purchased and active');
+    upgradeDesc.textContent = 'Active \u2014 each press counts for 2';
+    upgradeCost.textContent = 'Owned';
+
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
